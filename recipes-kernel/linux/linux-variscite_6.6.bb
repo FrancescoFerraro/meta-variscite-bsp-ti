@@ -7,7 +7,23 @@ inherit kernel
 
 DEFCONFIG_BUILDER = "${S}/ti_config_fragments/defconfig_builder.sh"
 require recipes-kernel/linux/setup-defconfig.inc
-require recipes-kernel/linux/ti-kernel.inc
+
+# ****************************************************************************
+#require recipes-kernel/linux/ti-kernel.inc
+# Add DTC FLAGS -@ when KERNEL_DTB_OVERLAY_SUPPORT is enabled
+
+def get_extra_dtc_args(d):
+    if d.getVar('KERNEL_DTB_OVERLAY_SUPPORT') == "1":
+        return "DTC_FLAGS=-@"
+    else:
+        return ""
+
+EXTRA_DTC_ARGS += "${@get_extra_dtc_args(d)}"
+
+# Tell the kernel class to install the DTBs in the same directory structure as
+# the kernel.
+KERNEL_DTBDEST = "${KERNEL_IMAGEDEST}/dtb"
+# ****************************************************************************
 
 DEPENDS += "gmp-native libmpc-native"
 
@@ -16,19 +32,15 @@ KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT} \
 
 S = "${WORKDIR}/git"
 
-BRANCH = "ti-linux-6.1.y_09.02.01.10_var01"
-SRCREV = "055ead3d5359b960b239e27da486c8afff72494f"
-PV = "6.1.83+git${SRCPV}"
+BRANCH = "dev_ti-linux-6.6.y_RND-2749_am62p"
+SRCREV = "03710bf3ddf59eea3ff0a9c08c96826df1ae976e"
+PV = "6.6.58+git"
 KBUILD_DEFCONFIG = "am62x_var_defconfig"
 
 # Do not put dtb in ti subdir
 KERNEL_DTBVENDORED = "0"
 
-# Append to the MACHINE_KERNEL_PR so that a new SRCREV will cause a rebuild
-MACHINE_KERNEL_PR:append = "b"
-PR = "${MACHINE_KERNEL_PR}"
-
-KERNEL_GIT_URI = "git://github.com/varigit/ti-linux-kernel"
+KERNEL_GIT_URI = "git://github.com/FrancescoFerraro/ti-linux-kernel"
 KERNEL_GIT_PROTOCOL = "https"
 SRC_URI += "${KERNEL_GIT_URI};protocol=${KERNEL_GIT_PROTOCOL};branch=${BRANCH}"
 
@@ -63,4 +75,4 @@ do_configure:prepend() {
 	fi
 }
 
-COMPATIBLE_MACHINE = "(am62x-var-som)"
+COMPATIBLE_MACHINE = "(am62x-var-som|am62px-var-som)"
