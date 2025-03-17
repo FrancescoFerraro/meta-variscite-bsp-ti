@@ -12,3 +12,9 @@ BRANCH = "dev_ti-u-boot-2024.04_10.01.10.04_var01_RND-2748_am62p"
 SRCREV = "aa9d53a56f3dd59474330090478a9e7995abb75b"
 
 COMPATIBLE_MACHINE = "(am62x-var-som|am62px-var-som)"
+
+do_deploy:append() {
+    if [ -L ${DEPLOY_DIR_IMAGE}/fw_env.config ]; then
+        rm ${DEPLOY_DIR_IMAGE}/fw_env.config
+    fi
+}
