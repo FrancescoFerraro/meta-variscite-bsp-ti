@@ -8,22 +8,7 @@ inherit kernel
 DEFCONFIG_BUILDER = "${S}/ti_config_fragments/defconfig_builder.sh"
 require recipes-kernel/linux/setup-defconfig.inc
 
-# ****************************************************************************
-#require recipes-kernel/linux/ti-kernel.inc
-# Add DTC FLAGS -@ when KERNEL_DTB_OVERLAY_SUPPORT is enabled
-
-def get_extra_dtc_args(d):
-    if d.getVar('KERNEL_DTB_OVERLAY_SUPPORT') == "1":
-        return "DTC_FLAGS=-@"
-    else:
-        return ""
-
-EXTRA_DTC_ARGS += "${@get_extra_dtc_args(d)}"
-
-# Tell the kernel class to install the DTBs in the same directory structure as
-# the kernel.
-KERNEL_DTBDEST = "${KERNEL_IMAGEDEST}/dtb"
-# ****************************************************************************
+require recipes-kernel/linux/ti-kernel.inc
 
 DEPENDS += "gmp-native libmpc-native"
 
@@ -33,7 +18,7 @@ KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT} \
 S = "${WORKDIR}/git"
 
 BRANCH = "dev_ti-linux-6.6.y_10.01.10.04_var01_RND-2749_am62p"
-SRCREV = "3da5c8f5c409b56f1a711eb0b8bcdf335c4c3260"
+SRCREV = "b38255b91d66715df3f5796af3d50df0457ab368"
 PV = "6.6.58+git"
 KBUILD_DEFCONFIG = "am62x_var_defconfig"
 
@@ -42,7 +27,9 @@ KERNEL_DTBVENDORED = "0"
 
 KERNEL_GIT_URI = "git://github.com/FrancescoFerraro/ti-linux-kernel"
 KERNEL_GIT_PROTOCOL = "https"
-SRC_URI += "${KERNEL_GIT_URI};protocol=${KERNEL_GIT_PROTOCOL};branch=${BRANCH}"
+SRC_URI = " \
+    ${KERNEL_GIT_URI};protocol=${KERNEL_GIT_PROTOCOL};${KERNEL_GIT_BRANCH} \
+"
 
 FILES_${KERNEL_PACKAGE_NAME}-devicetree += "/${KERNEL_IMAGEDEST}/*.itb"
 
